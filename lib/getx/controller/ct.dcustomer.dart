@@ -27,6 +27,19 @@ class DCustomerController extends GetxController {
     if (args['role'] == 'Customer') {
       isCustomer.value = true;
     }
+    if (args['id'] != null) {
+    final id = args['id'];
+    Customer customer = service.getCustomerDetailsById(id);
+    firstname.value = customer.firstName;
+    middlename.value = customer.middleName;
+    lastname.value = customer.lastName;
+    phone.value = customer.phone;
+    address.value = customer.address;
+    quantity.value = customer.quantity;
+    rate.value = customer.rate;
+    milktype.value = customer.milkType;
+    deliverytime.value = customer.deliveryTime;
+    } else {
     Customer customer = service.getCustomerDetails();
     firstname.value = customer.firstName;
     middlename.value = customer.middleName;
@@ -37,5 +50,6 @@ class DCustomerController extends GetxController {
     rate.value = customer.rate;
     milktype.value = customer.milkType;
     deliverytime.value = customer.deliveryTime;
+    }
   }
 }

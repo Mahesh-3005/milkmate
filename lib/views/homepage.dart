@@ -216,12 +216,13 @@ class HomePage extends StatelessWidget {
                       ),
                       InkWell(
                         onTap: () {
-                          DateTime fromDate = DateTime(2025, 9, 9);
-                          DateTime toDate = DateTime(2025, 9, 13);
-                           controller.generateMatrixReport(
-                            fromDate,
-                            toDate,
-                          );
+                          Get.toNamed('/abill');
+                          // DateTime fromDate = DateTime(2025, 9, 9);
+                          // DateTime toDate = DateTime(2025, 9, 13);
+                          //  controller.generateMatrixReport(
+                          //   fromDate,
+                          //   toDate,
+                          // );
                         },
                         child: Container(
                           height: 70.h,
@@ -234,7 +235,7 @@ class HomePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '',
+                                'Generate \nBill',
                                 style: TextStyle(
                                   fontSize: 20.sp,
                                   fontWeight: FontWeight.bold,

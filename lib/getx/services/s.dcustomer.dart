@@ -9,4 +9,9 @@ final Box<Customer> customerBox = Hive.box<Customer>('Customer');
   final customer = customerBox.values.first;
   return customer;
  }
+
+ getCustomerDetailsById(String id) {
+  final customer = customerBox.values.firstWhere((e)=> e.id == id);
+  return customer;
+ }
 }
