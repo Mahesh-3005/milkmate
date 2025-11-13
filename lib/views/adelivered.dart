@@ -72,13 +72,13 @@ class ADelivered extends StatelessWidget {
                         ),
                           ],
                         ),
-                        TextButton(onPressed: () => controller.isTodayMarked(), child: Text(
-                            'Check',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),)
+                        // TextButton(onPressed: () => controller.isTodayMarked(), child: Text(
+                        //     'Check',
+                        //     style: TextStyle(
+                        //       fontSize: 18,
+                        //       fontWeight: FontWeight.bold,
+                        //     ),
+                        //   ),)
                       ],
                     );
                   }),

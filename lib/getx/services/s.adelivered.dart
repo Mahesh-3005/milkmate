@@ -16,10 +16,21 @@ class ADeliveredService extends GetxService{
     }
   }
   
-  getCustomerList(){
+  getCustomerList(DateTime date){
     final customers = customerBox.values.toList();
-    return customers;
+
+    List<Customer> deliveredIds = [];
+    for (var customer in customers) {
+     final Delivered = deliveredBox.values.where((e)=> e.date.day == date.day &&  e.date.month == date.month && e.date.year == date.year && e.customerId == customer.id);
+     if (Delivered.isNotEmpty) {
+       
+     } else {
+      deliveredIds.add(customer);
+     }
+    }
+    return deliveredIds;
   }
+
 
   saveCustomer(Delivered delivered){
     // deliveredBox. clear();

@@ -112,37 +112,76 @@ class ABill extends StatelessWidget {
                         onTap: () => controller.selectEndDate(context),
                       ),
                       SizedBox(height: 20.h),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            if (controller.startDate.value !=
-                                    DateTime(2000, 1, 1) &&
-                                controller.endDate.value !=
-                                    DateTime(2000, 1, 1)) {
-                              await controller.generateMatrixReport(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (controller.startDate.value !=
+                                        DateTime(2000, 1, 1) &&
+                                    controller.endDate.value !=
+                                        DateTime(2000, 1, 1)) {
+                                  await controller.generateMatrixReport(
+                                    controller.startDate.value,
+                                    controller.endDate.value,
+                                  );
+                                } else {
+                                  Get.snackbar(
+                                    'Select Date',
+                                    'Select start and end date',
+                                  );
+                                }
+                              },
+                              child: Text('Generate Excel'),
+                            ),
+                          ),
+                          Center(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (controller.startDate.value !=
+                                        DateTime(2000, 1, 1) &&
+                                    controller.endDate.value !=
+                                        DateTime(2000, 1, 1)) {
+                                  await controller.generatePdfReport(
+                                    controller.startDate.value,
+                                    controller.endDate.value,
+                                  );
+                                } else {
+                                  Get.snackbar(
+                                    'Select Date',
+                                    'Select start and end date',
+                                  );
+                                }
+                              },
+                              child: Text('Generate PDF'),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10.sp,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              await controller.exportDecoratedDeliveriesExcel(
                                 controller.startDate.value,
                                 controller.endDate.value,
                               );
-                            } else {
-                              Get.snackbar(
-                                'Select Date',
-                                'Select start and end date',
+                            },
+                            child: Text('Extra Milk Excel'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              await controller.exportDeliveriesPDF(
+                                controller.startDate.value,
+                                controller.endDate.value,
                               );
-                            }
-                          },
-                          child: Text('Generate Excel'),
-                        ),
-                      ),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            await controller.generatePdfReport(
-                              controller.startDate.value,
-                              controller.endDate.value,
-                            );
-                          },
-                          child: Text('Generate PDF'),
-                        ),
+                            },
+                            child: Text('Extra Milk PDF'),
+                          ),
+                        ],
                       ),
                     ],
                   ),

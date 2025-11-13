@@ -14,8 +14,9 @@ class ADeliveredController extends GetxService {
 
   @override
   void onInit() {
-    selectedIds.clear();
-    customerList.value = service.getCustomerList();
+     _loadCustomers(selectedDate.value);
+    // selectedIds.clear();
+    // customerList.value = service.getCustomerList(DateTime.now());
     super.onInit();
   }
 
@@ -72,8 +73,15 @@ class ADeliveredController extends GetxService {
     }
   }
 
-  void setDate(DateTime date) {
+  void _loadCustomers(DateTime date) {
+    selectedIds.clear();
+    selected.clear();
+    customerList.value = service.getCustomerList(date);
+  }
+
+  void setDate(DateTime date) async {
     selectedDate.value = date;
+    _loadCustomers(date);
   }
 
   @override
