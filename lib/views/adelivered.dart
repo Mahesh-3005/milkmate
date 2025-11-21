@@ -170,8 +170,10 @@ class ADelivered extends StatelessWidget {
                       Center(
                         child: InkWell(
                           onTap: () {
-                            controller.saveCustomer();
-                            Get.offAllNamed('/home');
+                            if (controller.saveCustomer()) {
+                              Get.snackbar("Success", "Customers Delivered Marked Successfully");
+                              Get.offAllNamed('/home');
+                            }
                           },
                           child: Container(
                             height: 35.h,

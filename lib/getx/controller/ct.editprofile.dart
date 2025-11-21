@@ -63,7 +63,7 @@ class EditProfilePageController extends GetxController {
           admin.id,
           admin,
         );
-        Get.snackbar('Success', 'Your Profile Updated Successfully');
+        Get.snackbar('Success', 'Admin Details Updated Successfully');
         return true;
       } else {
         Get.snackbar('Error', 'Cannot find Organization');

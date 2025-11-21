@@ -53,6 +53,7 @@ class LoginController extends GetxController {
       isUserPresent == 'Admin'
           ? saveAdminSession(user)
           : saveCustomerSession(user);
+      Get.snackbar("Success", "Login Successful");
     } else {
       Get.snackbar("Error", "You Account is not created yet");
     }

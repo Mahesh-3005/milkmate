@@ -71,6 +71,7 @@ class ADeliveredController extends GetxService {
       // delivered.date = DateTime.now().toIso8601String().split('T').first;
       service.saveCustomer(newDelivered);
     }
+    return true;
   }
 
   void _loadCustomers(DateTime date) {

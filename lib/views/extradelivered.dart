@@ -335,8 +335,10 @@ class SelectedCustomerListView extends StatelessWidget {
         ),
         ElevatedButton(
           onPressed: () {
-            controller.saveExtraDeliveries();
-            Get.offAllNamed('/home');
+            if (controller.saveExtraDeliveries()) {
+              Get.snackbar("Success", "Extra Deliveries Saved Successfully");
+              Get.offAllNamed('/home');
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue, // button color

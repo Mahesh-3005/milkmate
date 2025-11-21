@@ -166,6 +166,7 @@ class DCustomerProfile extends StatelessWidget {
                           child: InkWell(
                             onTap: () async {
                               if (await controller.save()) {
+                                Get.snackbar("Success", "Customer Details Updated Successfully");
                                 Get.offNamed('/acustomer');
                               }
                             },

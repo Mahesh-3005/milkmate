@@ -3,6 +3,7 @@ import 'package:milklog/getx/binding/bd.abill.dart';
 import 'package:milklog/getx/binding/bd.acustomer.dart';
 import 'package:milklog/getx/binding/bd.addcustomer.dart';
 import 'package:milklog/getx/binding/bd.adelivered.dart';
+import 'package:milklog/getx/binding/bd.areport.dart';
 import 'package:milklog/getx/binding/bd.dcustomerprofile.dart';
 import 'package:milklog/getx/binding/bd.editprofile.dart';
 import 'package:milklog/getx/binding/bd.dcustomer.dart';
@@ -17,6 +18,7 @@ import 'package:milklog/views/abill.dart';
 import 'package:milklog/views/acustomer.dart';
 import 'package:milklog/views/addcustomer.dart';
 import 'package:milklog/views/adelivered.dart';
+import 'package:milklog/views/areport.dart';
 import 'package:milklog/views/customerhome.dart';
 import 'package:milklog/views/dcustomerprofile.dart';
 import 'package:milklog/views/editprofile.dart';
@@ -99,6 +101,11 @@ class AppPages {
       name: ('/abill'),
       page: () => ABill(),
       binding: ABillBindings(),
+    ),
+    GetPage(
+      name: ('/areport'),
+      page: () => AReport(),
+      binding: AReportBindings(),
     ),
   ];
 }

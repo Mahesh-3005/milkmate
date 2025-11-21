@@ -302,6 +302,60 @@ class HomePage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  SizedBox(height: 10.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () => Get.toNamed('/areport'),
+                        child: Container(
+                          height: 70.h,
+                          width: (MediaQuery.sizeOf(context).width / 5) * 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.sp),
+                            color: Colors.deepPurple[300],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Reports',
+                                style: TextStyle(
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // InkWell(
+                      //   // onTap: () => Get.toNamed('/extradelivered'),
+                      //   child: Container(
+                      //     height: 70.h,
+                      //     width: (MediaQuery.sizeOf(context).width / 5) * 2,
+                      //     decoration: BoxDecoration(
+                      //       borderRadius: BorderRadius.circular(20.sp),
+                      //       color: Colors.deepPurple[300],
+                      //     ),
+                      //     child: Column(
+                      //       mainAxisAlignment: MainAxisAlignment.center,
+                      //       children: [
+                      //         Text(
+                      //           'Extra \nDelivered',
+                      //           style: TextStyle(
+                      //             fontSize: 20.sp,
+                      //             fontWeight: FontWeight.bold,
+                      //             color: Colors.white,
+                      //           ),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
+                  ),
                   SizedBox(height: 30.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
