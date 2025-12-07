@@ -3,6 +3,8 @@ import 'package:milklog/getx/binding/bd.abill.dart';
 import 'package:milklog/getx/binding/bd.acustomer.dart';
 import 'package:milklog/getx/binding/bd.addcustomer.dart';
 import 'package:milklog/getx/binding/bd.adelivered.dart';
+import 'package:milklog/getx/binding/bd.aexpense.dart';
+import 'package:milklog/getx/binding/bd.aincome.dart';
 import 'package:milklog/getx/binding/bd.areport.dart';
 import 'package:milklog/getx/binding/bd.dcustomerprofile.dart';
 import 'package:milklog/getx/binding/bd.editprofile.dart';
@@ -18,6 +20,8 @@ import 'package:milklog/views/abill.dart';
 import 'package:milklog/views/acustomer.dart';
 import 'package:milklog/views/addcustomer.dart';
 import 'package:milklog/views/adelivered.dart';
+import 'package:milklog/views/aexpense.dart';
+import 'package:milklog/views/aincome.dart';
 import 'package:milklog/views/areport.dart';
 import 'package:milklog/views/customerhome.dart';
 import 'package:milklog/views/dcustomerprofile.dart';
@@ -106,6 +110,16 @@ class AppPages {
       name: ('/areport'),
       page: () => AReport(),
       binding: AReportBindings(),
+    ),
+    GetPage(
+      name: ('/aexpense'),
+      page: () => AExpense(),
+      binding: AExpenseBinding(),
+    ),
+    GetPage(
+      name: ('/aincome'),
+      page: () => AIncome(),
+      binding: AIncomeBimding(),
     ),
   ];
 }

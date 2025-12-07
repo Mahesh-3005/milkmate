@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:milklog/getx/services/s.deliverystatus.dart';
-import 'package:milklog/hive_model/customer.dart';
 
 class DeliveryStatusController extends GetxController {
   RxList<DateTime> deliveryDates = <DateTime>[].obs; 

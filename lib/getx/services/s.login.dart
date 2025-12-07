@@ -4,6 +4,8 @@ import 'package:milklog/hive_model/admin.dart';
 import 'package:milklog/hive_model/customer.dart';
 import 'package:milklog/hive_model/delivered.dart';
 import 'package:milklog/hive_model/edelivered.dart';
+import 'package:milklog/hive_model/expense.dart';
+import 'package:milklog/hive_model/income.dart';
 import 'package:milklog/hive_model/organization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -52,6 +54,8 @@ class LoginService extends GetxService {
   final adminBox = Hive.box<Admin>('Admin');
   final deliveredBox = Hive.box<Delivered>('Delivered');
   final edeliveredBox = Hive.box<Edelivered>('Edelivered');
+  final expenseBox = Hive.box<ExpenseModel>('Expense');
+  final incomeBox = Hive.box<IncomeModel>('Income');
 
   try {
     // 1. Fetch Admin record
@@ -102,6 +106,25 @@ class LoginService extends GetxService {
       final edelivered = Edelivered.fromMap(item);
       await edeliveredBox.put(edelivered.id, edelivered);
     }
+
+    final expenseResponse = await supabase
+        .from('Expense')
+        .select();
+      
+    for (var item in expenseResponse) {
+      final expense = ExpenseModel.fromMap(item);
+      await expenseBox.put(expense.id, expense);
+    }
+
+    final incomeResponse = await supabase
+        .from('Income')
+        .select();
+      
+    for (var item in incomeResponse) {
+      final income = IncomeModel.fromMap(item);
+      await incomeBox.put(income.id, income);
+    }
+    
 
     print("✅ Initial sync completed for admin $adminId");
   } catch (e) {

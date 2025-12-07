@@ -7,6 +7,8 @@ import 'package:milklog/hive_model/admin.dart';
 import 'package:milklog/hive_model/customer.dart';
 import 'package:milklog/hive_model/delivered.dart';
 import 'package:milklog/hive_model/edelivered.dart';
+import 'package:milklog/hive_model/expense.dart';
+import 'package:milklog/hive_model/income.dart';
 import 'package:milklog/hive_model/organization.dart';
 import 'package:milklog/routes/app_routes.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -22,6 +24,9 @@ void main() async{
   Hive.registerAdapter(OrganizationAdapter());
   Hive.registerAdapter(DeliveredAdapter());
   Hive.registerAdapter(EdeliveredAdapter());
+  Hive.registerAdapter(ExpenseModelAdapter());
+  Hive.registerAdapter(IncomeModelAdapter());
+  
 
   // ✅ Open Hive boxes
   await Hive.openBox<Admin>('Admin');
@@ -29,6 +34,9 @@ void main() async{
   await Hive.openBox<Organization>('Organization');
   await Hive.openBox<Delivered>('Delivered');
   await Hive.openBox<Edelivered>('Edelivered');
+  await Hive.openBox<ExpenseModel>('Expense');
+  await Hive.openBox<IncomeModel>('Income');
+
 
   await dotenv.load(fileName: ".env");
 

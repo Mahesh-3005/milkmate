@@ -4,6 +4,8 @@ import 'package:milklog/hive_model/admin.dart';
 import 'package:milklog/hive_model/customer.dart';
 import 'package:milklog/hive_model/delivered.dart';
 import 'package:milklog/hive_model/edelivered.dart';
+import 'package:milklog/hive_model/expense.dart';
+import 'package:milklog/hive_model/income.dart';
 import 'package:milklog/hive_model/organization.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -16,6 +18,8 @@ class SyncService extends GetxService {
   final Box<Customer> customerBox = Hive.box<Customer>('Customer');
   final Box<Delivered> deliveredBox = Hive.box<Delivered>('Delivered');
   final Box<Edelivered> edeliveredBox = Hive.box<Edelivered>('Edelivered');
+  final Box<ExpenseModel> expenseBox = Hive.box<ExpenseModel>('Expense');
+  final Box<IncomeModel> incomeBox = Hive.box<IncomeModel>('Income');
 
   Future<void> syncAdmin() async {
     final unsynced = adminBox.values.where((c) => c.isSynced == false).toList();
@@ -166,6 +170,52 @@ class SyncService extends GetxService {
         }
       } catch (e) {
         print("Sync failed for ${edeliveries.id}: $e");
+      }
+    }
+  }
+
+  Future<void> syncExpense() async {
+    final unsynced =
+        expenseBox.values.where((c) => c.isSynced == false).toList();
+
+    for (var expense in unsynced) {
+      try {
+        // UPDATE existing record
+        final response =
+            await supabase
+                .from('Expense')
+                .upsert(expense.toMap())
+                .select();
+
+        if (response.isNotEmpty) {
+          expense.isSynced = true;
+          await expense.save();
+        }
+      } catch (e) {
+        print("Sync failed for ${expense.id}: $e");
+      }
+    }
+  }
+
+  Future<void> syncIncome() async {
+    final unsynced =
+        incomeBox.values.where((c) => c.isSynced == false).toList();
+
+    for (var income in unsynced) {
+      try {
+        // UPDATE existing record
+        final response =
+            await supabase
+                .from('Income')
+                .upsert(income.toMap())
+                .select();
+
+        if (response.isNotEmpty) {
+          income.isSynced = true;
+          await income.save();
+        }
+      } catch (e) {
+        print("Sync failed for ${income.id}: $e");
       }
     }
   }

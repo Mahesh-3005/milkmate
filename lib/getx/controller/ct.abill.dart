@@ -12,7 +12,9 @@ import 'package:milklog/hive_model/edelivered.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:typed_data';
 import 'package:share_plus/share_plus.dart';
 
 class ABillController extends GetxController {
@@ -32,20 +34,21 @@ class ABillController extends GetxController {
   }
 
   List<DateTime> getDatesBetween(DateTime start, DateTime end) {
-    List<DateTime> dates = [];
-    for (
-      var d = start;
-      d.isBefore(end.add(const Duration(days: 1)));
-      d = d.add(const Duration(days: 1))
-    ) {
-      dates.add(d);
+    final List<DateTime> dates = [];
+    // Normalize to date-only values to avoid time-of-day overflow adding an extra day
+    DateTime cur = DateTime(start.year, start.month, start.day);
+    final DateTime last = DateTime(end.year, end.month, end.day);
+    while (!cur.isAfter(last)) {
+      dates.add(cur);
+      cur = cur.add(const Duration(days: 1));
     }
     return dates;
   }
 
-  Future<void> generatePdfReport(DateTime fromDate, DateTime toDate) async {
+  Future<void> generatePdfReport(DateTime fromDate, DateTime toDate, {String? customerId, bool share = true, bool doPrint = false}) async {
     final Box<Delivered> deliveredBox = Hive.box<Delivered>('Delivered');
     final Box<Customer> customerBox = Hive.box<Customer>('Customer');
+    final Box<Edelivered> edeliveredBox = Hive.box<Edelivered>('Edelivered');
 
     final pdf = pw.Document();
 
@@ -53,177 +56,187 @@ class ABillController extends GetxController {
 
     final idToCustomer = {for (var c in customerBox.values) c.id: c};
 
-    final customers =
-        deliveredBox.values.map((e) => e.customerId).toSet().toList();
-
-    // ---------------- Summary Table ----------------
-    List<List<String>> summaryData = [];
-
-    double grandTotalQuantity = 0;
-    int grandTotalDeliveredDays = 0;
-    double grandTotalPayable = 0;
-
-    for (var customerId in customers) {
-      final customer = idToCustomer[customerId];
-      if (customer == null) continue;
-
-      final qty = customer.quantity.toDouble();
-      final rate = customer.rate.toDouble();
-
-      int deliveredDays =
-          deliveredBox.values
-              .where(
-                (e) =>
-                    e.customerId == customerId &&
-                    e.date.isAfter(
-                      fromDate.subtract(const Duration(days: 1)),
-                    ) &&
-                    e.date.isBefore(toDate.add(const Duration(days: 1))),
-              )
-              .length;
-
-      final payable = qty * rate * deliveredDays;
-
-      grandTotalQuantity += qty * deliveredDays;
-      grandTotalDeliveredDays += deliveredDays;
-      grandTotalPayable += payable;
-
-      summaryData.add([
-        '${customer.firstName} ${customer.middleName} ${customer.lastName}',
-        '${qty.toStringAsFixed(2)} L',
-        'Rs ${rate.toStringAsFixed(2)}',
-        '$deliveredDays',
-        'Rs ${payable.toStringAsFixed(2)}',
-      ]);
-    }
-
-    // ---------------- PDF Content ----------------
-    pdf.addPage(
-      pw.MultiPage(
-        pageFormat: PdfPageFormat.a4,
-        margin: const pw.EdgeInsets.all(20),
-        build:
-            (context) => [
-              pw.Text(
-                'Milk Delivery Report',
-                style: pw.TextStyle(
-                  fontSize: 20,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.SizedBox(height: 5),
-              pw.Text(
-                'From: ${fromDate.day}-${fromDate.month}-${fromDate.year} To: ${toDate.day}-${toDate.month}-${toDate.year}',
-                style: pw.TextStyle(fontSize: 12),
-              ),
-              pw.SizedBox(height: 20),
-
-              // --- Summary Table ---
-              pw.Text(
-                'Customer Summary',
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-              ),
-              pw.SizedBox(height: 5),
-              pw.Table.fromTextArray(
-                headers: [
-                  'Customer Name',
-                  'Quantity',
-                  'Rate',
-                  'Delivered Days',
-                  'Payable',
-                ],
-                data: summaryData,
-                headerStyle: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.white,
-                ),
-                headerDecoration: pw.BoxDecoration(color: PdfColors.blue300),
-                cellAlignment: pw.Alignment.center,
-                cellPadding: const pw.EdgeInsets.symmetric(
-                  vertical: 4,
-                  horizontal: 2,
-                ),
-                oddRowDecoration: pw.BoxDecoration(color: PdfColors.grey200),
-              ),
-              pw.SizedBox(height: 10),
-
-              // Grand Total
-              pw.Container(
-                alignment: pw.Alignment.centerRight,
-                child: pw.Text(
-                  'Grand Total: Quantity ${grandTotalQuantity.toStringAsFixed(1)} L | '
-                  'Delivered Days $grandTotalDeliveredDays | '
-                  'Payable Rs.${grandTotalPayable.toStringAsFixed(2)}',
-                  style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-                ),
-              ),
-              pw.SizedBox(height: 20),
-
-              // --- Daily Delivery Matrix ---
-              pw.Text(
-                'Daily Delivery Matrix',
-                style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-              ),
-              pw.SizedBox(height: 5),
-              pw.Table.fromTextArray(
-                // headers: ['Customer', ...dates.map((d) => '${d.day}-${d.month}').toList()],
-                headers: ['Customer', ...dates.map((d) => '${d.day}').toList()],
-                data: [
-                  for (var customerId in customers)
-                    [
-                      '${idToCustomer[customerId]?.firstName ?? ''} '
-                          // '${idToCustomer[customerId]?.middleName ?? ''} '
-                          '${idToCustomer[customerId]?.lastName ?? ''}',
-                      ...dates.map((date) {
-                        final delivered = deliveredBox.values.any(
-                          (e) =>
-                              e.customerId == customerId &&
-                              e.date.year == date.year &&
-                              e.date.month == date.month &&
-                              e.date.day == date.day,
-                        );
-                        return delivered ? 'Y' : '';
-                      }).toList(),
-                    ],
-                ],
-                headerStyle: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.white,
-                ),
-                headerDecoration: pw.BoxDecoration(color: PdfColors.blue300),
-                cellAlignment: pw.Alignment.center,
-                cellPadding: const pw.EdgeInsets.symmetric(
-                  vertical: 2,
-                  horizontal: 2,
-                ),
-                oddRowDecoration: pw.BoxDecoration(color: PdfColors.grey100),
-              ),
-            ],
-      ),
-    );
-
-    // ---------------- Save & Share PDF ----------------
-    if (await Permission.storage.request().isGranted) {
-      final directory = Directory('/storage/emulated/0/Download');
-      if (!await directory.exists()) await directory.create(recursive: true);
-
-      final filePath =
-          '${directory.path}/MilkDelivery_${fromDate.day}-${fromDate.month}-${fromDate.year}_to_${toDate.day}-${toDate.month}-${toDate.year}.pdf';
-
-      final file = File(filePath);
-      await file.writeAsBytes(await pdf.save());
-
-      print('✅ PDF saved at $filePath');
-
-      // Share the PDF
-      await Share.shareXFiles(
-        [XFile(filePath)],
-        text:
-            "📄 Milk Delivery Report (${fromDate.day}-${fromDate.month}-${fromDate.year} → ${toDate.day}-${toDate.month}-${toDate.year})",
-      );
+    final customers = <String>[];
+    if (customerId != null && idToCustomer.containsKey(customerId)) {
+      customers.add(customerId);
     } else {
-      print('❌ Storage permission denied');
+      // include all customers that appear in either delivered or edelivered boxes
+      final fromDelivered = deliveredBox.values.map((e) => e.customerId).toSet();
+      final fromExtra = edeliveredBox.values.map((e) => e.customerId).toSet();
+      final all = {...fromDelivered, ...fromExtra};
+      customers.addAll(all);
     }
+
+    for (var custId in customers) {
+      final customer = idToCustomer[custId];
+      final customerName = customer != null ? '${customer.firstName} ${customer.middleName} ${customer.lastName}' : custId;
+      final rate = customer?.rate.toDouble() ?? 0.0;
+      final baseQty = customer?.quantity.toDouble() ?? 0.0;
+
+      List<List<String>> tableData = [];
+      double totalPayable = 0.0;
+
+      for (var d in dates) {
+        final delivered = deliveredBox.values.firstWhereOrNull((e) => !e.isDeleted && e.customerId == custId && e.date.year == d.year && e.date.month == d.month && e.date.day == d.day);
+        final dailyQty = delivered != null ? baseQty : 0.0;
+
+        final extras = edeliveredBox.values.where((e) => !e.isDeleted && e.customerId == custId && e.date.year == d.year && e.date.month == d.month && e.date.day == d.day).toList();
+        final extraQty = extras.fold<double>(0.0, (p, e) => p + e.quantity);
+
+        final totalQty = dailyQty + extraQty;
+        final payable = totalQty * rate;
+        totalPayable += payable;
+
+        tableData.add([
+          DateFormat('dd/MM/yyyy').format(d),
+          dailyQty.toStringAsFixed(2),
+          extraQty.toStringAsFixed(2),
+          totalQty.toStringAsFixed(2),
+          rate.toStringAsFixed(2),
+          payable.toStringAsFixed(2),
+        ]);
+      }
+
+      // Build page for this customer
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(20),
+          build: (context) => [
+            pw.Text('Milk Delivered Report', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 6),
+            pw.Text(customerName, style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 4),
+            pw.Text('Period: ${DateFormat('dd/MM/yyyy').format(fromDate)} - ${DateFormat('dd/MM/yyyy').format(toDate)}', style: pw.TextStyle(fontSize: 12)),
+            pw.SizedBox(height: 12),
+
+            pw.Table.fromTextArray(
+              headers: ['Date', 'Daily Qty', 'Extra Qty', 'Total Qty', 'Rate', 'Payable'],
+              data: tableData,
+              headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+              headerDecoration: pw.BoxDecoration(color: PdfColors.blue300),
+              cellAlignment: pw.Alignment.center,
+              cellPadding: const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+            ),
+
+            pw.SizedBox(height: 12),
+            pw.Container(alignment: pw.Alignment.centerRight, child: pw.Text('Overall Bill: Rs ${totalPayable.toStringAsFixed(2)}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12))),
+          ],
+        ),
+      );
+    }
+
+    // Handle printing and/or sharing
+    try {
+      final pdfBytes = await pdf.save();
+
+      // Print if requested
+      if (doPrint) {
+        await Printing.layoutPdf(onLayout: (PdfPageFormat format) async => pdfBytes);
+      }
+
+      // Share/save if requested
+      if (share) {
+        if (await Permission.storage.request().isGranted) {
+          final directory = Directory('/storage/emulated/0/Download');
+          if (!await directory.exists()) await directory.create(recursive: true);
+
+          final filePath = '${directory.path}/MilkDelivered_${fromDate.day}-${fromDate.month}-${fromDate.year}_to_${toDate.day}-${toDate.month}-${toDate.year}.pdf';
+          final file = File(filePath);
+          await file.writeAsBytes(pdfBytes);
+          await Share.shareXFiles([XFile(filePath)], text: "📄 Milk Delivered Report (${fromDate.day}-${fromDate.month}-${fromDate.year} → ${toDate.day}-${toDate.month}-${toDate.year})");
+        } else {
+          print('❌ Storage permission denied');
+          Get.snackbar('Error', 'Storage permission denied');
+        }
+      }
+    } catch (e) {
+      print('Error saving/sharing/printing PDF: $e');
+      Get.snackbar('Error', 'Could not generate report: $e');
+    }
+  }
+
+  /// Build and return PDF bytes for the given date range (no saving/printing).
+  Future<Uint8List> buildPdfBytes(DateTime fromDate, DateTime toDate, {String? customerId}) async {
+    final Box<Delivered> deliveredBox = Hive.box<Delivered>('Delivered');
+    final Box<Customer> customerBox = Hive.box<Customer>('Customer');
+    final Box<Edelivered> edeliveredBox = Hive.box<Edelivered>('Edelivered');
+
+    final pdf = pw.Document();
+
+    final dates = getDatesBetween(fromDate, toDate);
+
+    final idToCustomer = {for (var c in customerBox.values) c.id: c};
+
+    final customers = <String>[];
+    if (customerId != null && idToCustomer.containsKey(customerId)) {
+      customers.add(customerId);
+    } else {
+      final fromDelivered = deliveredBox.values.map((e) => e.customerId).toSet();
+      final fromExtra = edeliveredBox.values.map((e) => e.customerId).toSet();
+      final all = {...fromDelivered, ...fromExtra};
+      customers.addAll(all);
+    }
+
+    for (var custId in customers) {
+      final customer = idToCustomer[custId];
+      final customerName = customer != null ? '${customer.firstName} ${customer.middleName} ${customer.lastName}' : custId;
+      final rate = customer?.rate.toDouble() ?? 0.0;
+      final baseQty = customer?.quantity.toDouble() ?? 0.0;
+
+      List<List<String>> tableData = [];
+      double totalPayable = 0.0;
+
+      for (var d in dates) {
+        final delivered = deliveredBox.values.firstWhereOrNull((e) => !e.isDeleted && e.customerId == custId && e.date.year == d.year && e.date.month == d.month && e.date.day == d.day);
+        final dailyQty = delivered != null ? baseQty : 0.0;
+
+        final extras = edeliveredBox.values.where((e) => !e.isDeleted && e.customerId == custId && e.date.year == d.year && e.date.month == d.month && e.date.day == d.day).toList();
+        final extraQty = extras.fold<double>(0.0, (p, e) => p + e.quantity);
+
+        final totalQty = dailyQty + extraQty;
+        final payable = totalQty * rate;
+        totalPayable += payable;
+
+        tableData.add([
+          DateFormat('dd/MM/yyyy').format(d),
+          dailyQty.toStringAsFixed(2),
+          extraQty.toStringAsFixed(2),
+          totalQty.toStringAsFixed(2),
+          rate.toStringAsFixed(2),
+          payable.toStringAsFixed(2),
+        ]);
+      }
+
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(20),
+          build: (context) => [
+            pw.Text('Milk Delivered Report', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 6),
+            pw.Text(customerName, style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+            pw.SizedBox(height: 4),
+            pw.Text('Period: ${DateFormat('dd/MM/yyyy').format(fromDate)} - ${DateFormat('dd/MM/yyyy').format(toDate)}', style: pw.TextStyle(fontSize: 12)),
+            pw.SizedBox(height: 12),
+
+            pw.Table.fromTextArray(
+              headers: ['Date', 'Daily Qty', 'Extra Qty', 'Total Qty', 'Rate', 'Payable'],
+              data: tableData,
+              headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+              headerDecoration: pw.BoxDecoration(color: PdfColors.blue300),
+              cellAlignment: pw.Alignment.center,
+              cellPadding: const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+            ),
+
+            pw.SizedBox(height: 12),
+            pw.Container(alignment: pw.Alignment.centerRight, child: pw.Text('Overall Bill: Rs ${totalPayable.toStringAsFixed(2)}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 12))),
+          ],
+        ),
+      );
+    }
+
+    return Uint8List.fromList(await pdf.save());
   }
 
   Future<void> generateMatrixReport(DateTime fromDate, DateTime toDate) async {
@@ -291,13 +304,13 @@ class ABillController extends GetxController {
 
       int deliveredDays = 0;
 
-      for (var date in dates) {
+      for (var d in dates) {
         final delivered = deliveredBox.values.any(
           (e) =>
               e.customerId == customerId &&
-              e.date.year == date.year &&
-              e.date.month == date.month &&
-              e.date.day == date.day,
+              e.date.year == d.year &&
+              e.date.month == d.month &&
+              e.date.day == d.day,
         );
         if (delivered) deliveredDays++;
       }
@@ -317,13 +330,13 @@ class ABillController extends GetxController {
         TextCellValue("₹${payableAmount.toStringAsFixed(2)}"),
       ];
 
-      for (var date in dates) {
+      for (var d in dates) {
         final delivered = deliveredBox.values.any(
           (e) =>
               e.customerId == customerId &&
-              e.date.year == date.year &&
-              e.date.month == date.month &&
-              e.date.day == date.day,
+              e.date.year == d.year &&
+              e.date.month == d.month &&
+              e.date.day == d.day,
         );
 
         if (delivered) {
@@ -464,9 +477,10 @@ Future<void> exportDecoratedDeliveriesExcel(
 
   // 1️⃣ Filter deliveries by date range
   final filteredDeliveries = deliveredBox.values.where((delivery) {
-    final d = delivery.date;
-    return d.isAfter(startDate.subtract(const Duration(days: 1))) &&
-        d.isBefore(endDate.add(const Duration(days: 1)));
+    final d = DateTime(delivery.date.year, delivery.date.month, delivery.date.day);
+    final s = DateTime(startDate.year, startDate.month, startDate.day);
+    final e = DateTime(endDate.year, endDate.month, endDate.day);
+    return !d.isBefore(s) && !d.isAfter(e);
   }).toList();
 
   if (filteredDeliveries.isEmpty) {
@@ -646,9 +660,10 @@ Future<void> exportDeliveriesPDF(DateTime startDate, DateTime endDate) async {
 
   // 1️⃣ Filter deliveries by date range
   final filteredDeliveries = deliveredBox.values.where((delivery) {
-    final d = delivery.date;
-    return d.isAfter(startDate.subtract(const Duration(days: 1))) &&
-        d.isBefore(endDate.add(const Duration(days: 1)));
+    final d = DateTime(delivery.date.year, delivery.date.month, delivery.date.day);
+    final s = DateTime(startDate.year, startDate.month, startDate.day);
+    final e = DateTime(endDate.year, endDate.month, endDate.day);
+    return !d.isBefore(s) && !d.isAfter(e);
   }).toList();
 
   if (filteredDeliveries.isEmpty) {

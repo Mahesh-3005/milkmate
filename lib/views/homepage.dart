@@ -215,15 +215,7 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                       InkWell(
-                        onTap: () {
-                          Get.toNamed('/abill');
-                          // DateTime fromDate = DateTime(2025, 9, 9);
-                          // DateTime toDate = DateTime(2025, 9, 13);
-                          //  controller.generateMatrixReport(
-                          //   fromDate,
-                          //   toDate,
-                          // );
-                        },
+                        onTap: () => Get.toNamed('/areport'),
                         child: Container(
                           height: 70.h,
                           width: (MediaQuery.sizeOf(context).width / 5) * 2,
@@ -235,7 +227,7 @@ class HomePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Generate \nBill',
+                                'Reports',
                                 style: TextStyle(
                                   fontSize: 20.sp,
                                   fontWeight: FontWeight.bold,
@@ -246,6 +238,38 @@ class HomePage extends StatelessWidget {
                           ),
                         ),
                       ),
+                      // InkWell(
+                      //   onTap: () {
+                      //     Get.toNamed('/abill');
+                      //     // DateTime fromDate = DateTime(2025, 9, 9);
+                      //     // DateTime toDate = DateTime(2025, 9, 13);
+                      //     //  controller.generateMatrixReport(
+                      //     //   fromDate,
+                      //     //   toDate,
+                      //     // );
+                      //   },
+                      //   child: Container(
+                      //     height: 70.h,
+                      //     width: (MediaQuery.sizeOf(context).width / 5) * 2,
+                      //     decoration: BoxDecoration(
+                      //       borderRadius: BorderRadius.circular(20.sp),
+                      //       color: Colors.deepPurple[300],
+                      //     ),
+                      //     child: Column(
+                      //       mainAxisAlignment: MainAxisAlignment.center,
+                      //       children: [
+                      //         Text(
+                      //           'Generate \nBill',
+                      //           style: TextStyle(
+                      //             fontSize: 20.sp,
+                      //             fontWeight: FontWeight.bold,
+                      //             color: Colors.white,
+                      //           ),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                   SizedBox(height: 10.h),
@@ -306,8 +330,9 @@ class HomePage extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      
                       InkWell(
-                        onTap: () => Get.toNamed('/areport'),
+                        onTap: () => Get.toNamed('/aincome'),
                         child: Container(
                           height: 70.h,
                           width: (MediaQuery.sizeOf(context).width / 5) * 2,
@@ -319,7 +344,7 @@ class HomePage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Reports',
+                                'Income',
                                 style: TextStyle(
                                   fontSize: 20.sp,
                                   fontWeight: FontWeight.bold,
@@ -330,32 +355,74 @@ class HomePage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // InkWell(
-                      //   // onTap: () => Get.toNamed('/extradelivered'),
-                      //   child: Container(
-                      //     height: 70.h,
-                      //     width: (MediaQuery.sizeOf(context).width / 5) * 2,
-                      //     decoration: BoxDecoration(
-                      //       borderRadius: BorderRadius.circular(20.sp),
-                      //       color: Colors.deepPurple[300],
-                      //     ),
-                      //     child: Column(
-                      //       mainAxisAlignment: MainAxisAlignment.center,
-                      //       children: [
-                      //         Text(
-                      //           'Extra \nDelivered',
-                      //           style: TextStyle(
-                      //             fontSize: 20.sp,
-                      //             fontWeight: FontWeight.bold,
-                      //             color: Colors.white,
-                      //           ),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
+                      InkWell(
+                        onTap: () => Get.toNamed('/aexpense'),
+                        child: Container(
+                          height: 70.h,
+                          width: (MediaQuery.sizeOf(context).width / 5) * 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.sp),
+                            color: Colors.deepPurple[300],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Expenses',
+                                style: TextStyle(
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
+
+
+                  SizedBox(height: 10.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Get.toNamed('/abill');
+                          // DateTime fromDate = DateTime(2025, 9, 9);
+                          // DateTime toDate = DateTime(2025, 9, 13);
+                          //  controller.generateMatrixReport(
+                          //   fromDate,
+                          //   toDate,
+                          // );
+                        },
+                        child: Container(
+                          height: 70.h,
+                          width: (MediaQuery.sizeOf(context).width / 5) * 2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20.sp),
+                            color: Colors.deepPurple[300],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Generate \nBill',
+                                style: TextStyle(
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      
+                    ],
+                  ),
+                  
                   SizedBox(height: 30.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,

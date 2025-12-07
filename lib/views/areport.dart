@@ -11,62 +11,61 @@ class AReport extends StatelessWidget {
   );
    AReport({super.key});
 
-  Future<void> _selectDateAndAction(BuildContext context, AReportController controller, ReportPeriod period) async {
-    // Pick a date (daily -> date; weekly -> any date within week; monthly -> any date in month)
-    final now = DateTime.now();
-    final picked = await showDatePicker(
+  // Modern progress dialog used during PDF generation/saving.
+  void _showProgressDialog(BuildContext context, String message) {
+    showDialog(
       context: context,
-      initialDate: now,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (picked == null) return;
-
-    // After picking date, show action sheet to Print or Save
-    showModalBottomSheet(
-      context: context,
+      barrierDismissible: false,
       builder: (_) {
-        return Padding(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Selected: ${picked.day}/${picked.month}/${picked.year}', style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
-              SizedBox(height: 12.h),
-              Row(
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: Center(
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 14.h),
+              decoration: BoxDecoration(
+                color: Theme.of(context).dialogBackgroundColor.withOpacity(0.98),
+                borderRadius: BorderRadius.circular(12.r),
+                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 12.r, offset: Offset(0, 6.h))],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        controller.printMilkReport(period, reference: picked);
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('Print'),
+                  SizedBox(
+                    width: 36.w,
+                    height: 36.w,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3.5,
+                      valueColor: AlwaysStoppedAnimation(Theme.of(context).primaryColor),
                     ),
                   ),
                   SizedBox(width: 12.w),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () async {
-                        final path = await controller.saveMilkReportToFile(period, reference: picked);
-                        Navigator.of(context).pop();
-                        if (path != null) Get.snackbar('Saved', path);
-                        else Get.snackbar('Error', 'Failed to save PDF');
-                      },
-                      child: Text('Save'),
+                  Flexible(
+                    child: Text(
+                      message,
+                      style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 12.h),
-            ],
+            ),
           ),
         );
       },
     );
   }
 
-  void _showReportSelector(BuildContext context, AReportController controller) {
+  // NOTE: consolidated flow: choose period, then pick reference date (day/week/month), then Print/Save
+
+  // Removed month-only helpers; using generic period+date selector instead.
+
+  /// Generic period selector that prompts for a reference date and then calls the provided callbacks.
+  void _showReportSelector(
+    BuildContext context,
+    AReportController controller,
+    Future<void> Function(ReportPeriod, {DateTime? reference}) onPrint,
+    Future<String?> Function(ReportPeriod, {DateTime? reference}) onSave,
+  ) {
     ReportPeriod selected = ReportPeriod.daily;
     showModalBottomSheet(
       context: context,
@@ -98,14 +97,35 @@ class AReport extends StatelessWidget {
                   groupValue: selected,
                   onChanged: (v) => setState(() => selected = v ?? ReportPeriod.monthly),
                 ),
+                RadioListTile<ReportPeriod>(
+                  title: Text('Yearly'),
+                  value: ReportPeriod.yearly,
+                  groupValue: selected,
+                  onChanged: (v) => setState(() => selected = v ?? ReportPeriod.yearly),
+                ),
                 SizedBox(height: 8.h),
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () {
-                          controller.printMilkReport(selected);
+                        onPressed: () async {
                           Navigator.of(ctx).pop();
+                          final now = DateTime.now();
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: now,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (picked == null) return;
+
+                          // show progress indicator while generating (modern dialog)
+                          _showProgressDialog(context, 'Generating report...');
+                          try {
+                            await onPrint(selected, reference: picked);
+                          } finally {
+                            Navigator.of(context, rootNavigator: true).pop();
+                          }
                         },
                         child: Text('Print'),
                       ),
@@ -114,8 +134,24 @@ class AReport extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () async {
-                          final path = await controller.saveMilkReportToFile(selected);
                           Navigator.of(ctx).pop();
+                          final now = DateTime.now();
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: now,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (picked == null) return;
+
+                          // show progress indicator while saving (modern dialog)
+                          _showProgressDialog(context, 'Saving report...');
+                          String? path;
+                          try {
+                            path = await onSave(selected, reference: picked);
+                          } finally {
+                            Navigator.of(context, rootNavigator: true).pop();
+                          }
                           Get.snackbar('Saved', path ?? 'Save failed');
                         },
                         child: Text('Save'),
@@ -131,6 +167,8 @@ class AReport extends StatelessWidget {
       },
     );
   }
+
+  // Profit uses the generic selector via the button below.
 
   @override
   Widget build(BuildContext context) {
@@ -166,58 +204,54 @@ class AReport extends StatelessWidget {
                       },
                     ),
                     ModernButton(
-                      icon: Icons.calendar_today,
-                      label: 'Daily Milk Report',
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFFFB86B), Color(0xFFFF6B6B)],
-                      ),
-                      onTap: () {
-                        _selectDateAndAction(context, controller, ReportPeriod.daily);
-                      },
-                    ),
-                    ModernButton(
-                      icon: Icons.event_note,
-                      label: 'Weekly Milk Report',
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF43E97B), Color(0xFF38F9D7)],
-                      ),
-                      onTap: () {
-                        _selectDateAndAction(context, controller, ReportPeriod.weekly);
-                      },
-                    ),
-                    ModernButton(
                       icon: Icons.calendar_month,
-                      label: 'Monthly Milk Report',
+                      label: 'Milk Report',
                       gradient: const LinearGradient(
                         colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
                       ),
                       onTap: () {
-                        _selectDateAndAction(context, controller, ReportPeriod.monthly);
+                        _showReportSelector(context, controller, controller.printMilkReport, controller.saveMilkReportToFile);
                       },
                     ),
-                    ModernButton(
-                      icon: Icons.pie_chart,
-                      label: 'Summary',
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
-                      ),
-                      onTap: () {/* TODO: navigate */},
-                    ),
+                    // ModernButton(
+                    //   icon: Icons.pie_chart,
+                    //   label: 'Summary',
+                    //   gradient: const LinearGradient(
+                    //     colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+                    //   ),
+                    //   onTap: () {/* TODO: navigate */},
+                    // ),
                     ModernButton(
                       icon: Icons.download,
-                      label: 'Export',
+                      label: 'Expense Report',
                       gradient: const LinearGradient(
                         colors: [Color(0xFFFF9A9E), Color(0xFFFAD0C4)],
                       ),
-                      onTap: () {/* TODO: action */},
+                      onTap: () { _showReportSelector(context, controller, controller.printExpenseReport, controller.saveExpenseReportToFile); },
+                    ),
+                    ModernButton(
+                      icon: Icons.pie_chart,
+                      label: 'Profit Report',
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF00C9A7), Color(0xFF92FE9D)],
+                      ),
+                      onTap: () { _showReportSelector(context, controller, controller.printProfitReport, controller.saveProfitReportToFile); },
+                    ),
+                    ModernButton(
+                      icon: Icons.summarize,
+                      label: 'Summary Report',
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+                      ),
+                      onTap: () { _showReportSelector(context, controller, controller.printSummaryReport, controller.saveSummaryReportToFile); },
                     ),
                     ModernButton(
                       icon: Icons.settings,
-                      label: 'Settings',
+                      label: 'Income Report',
                       gradient: const LinearGradient(
                         colors: [Color(0xFF56CCF2), Color(0xFF2F80ED)],
                       ),
-                      onTap: () {/* TODO: navigate */},
+                      onTap: () { _showReportSelector(context, controller, controller.printIncomeReport, controller.saveIncomeReportToFile); },
                     ),
                   ],
                 ),
