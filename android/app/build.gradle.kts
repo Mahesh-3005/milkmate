@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.milklog"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "28.0.13004108"
+    ndkVersion = "29.0.14206865"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
