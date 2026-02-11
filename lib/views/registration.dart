@@ -10,155 +10,181 @@ class Registration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
+      backgroundColor:
+          isDark ? const Color(0xFF121212) : const Color(0xFFF7F8FA),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.only(left: 30.w, top: 50.h, right: 30.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 40.h),
+
+              /// Header (same style as login)
+              Text(
+                'Create account 👋',
+                style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.w700),
+              ),
+              SizedBox(height: 6.h),
+              Text(
+                'Set up your organization',
+                style: TextStyle(fontSize: 16.sp, color: Colors.grey),
+              ),
+
+              SizedBox(height: 30.h),
+
+              /// Card (same as login)
+              Container(
+                padding: EdgeInsets.all(20.w),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow:
+                      isDark
+                          ? []
+                          : [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                ),
+                child: Column(
                   children: [
-                    Text(
-                      'Create',
-                      style: TextStyle(
-                        fontSize: 35.sp,
-                        fontWeight: FontWeight.w600,
-                        height: 0.2.h,
-                      ),
+                    MyTextfield(
+                      hinttext: 'First name',
+                      controller: controller.fnameCtrl,
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 10.h, left: 3.w),
-                      child: Text(
-                        'Organization',
-                        style: TextStyle(
-                          fontSize: 30.sp,
-                          fontWeight: FontWeight.w600,
-                          // color: Colors.grey[600],
-                        ),
-                      ),
+                    SizedBox(height: 14.h),
+                    MyTextfield(
+                      hinttext: 'Last name',
+                      controller: controller.lnameCtrl,
+                    ),
+                    SizedBox(height: 14.h),
+                    MyTextfield(
+                      hinttext: 'Phone number',
+                      controller: controller.phoneCtrl,
+                      maxlength: 10,
+                      type: TextInputType.phone,
+                    ),
+                    SizedBox(height: 14.h),
+                    MyTextfield(
+                      hinttext: 'Create password',
+                      controller: controller.passwordCtrl,
+                      obscureText: true,
+                    ),
+                    SizedBox(height: 14.h),
+                    MyTextfield(
+                      hinttext: 'Organization name',
+                      controller: controller.organizationCtrl,
+                    ),
+                    SizedBox(height: 14.h),
+                    MyTextfield(
+                      hinttext: 'Organization key',
+                      controller: controller.keyCtrl,
                     ),
                   ],
                 ),
-                // ToggleSwitch(
-                //   minWidth: 150.0,
-                //   cornerRadius: 20.0,
-                //   activeBgColors: [
-                //     [Colors.blue],
-                //     [Colors.blue],
-                //   ],
-                //   activeFgColor: Colors.white,
-                //   inactiveBgColor: Colors.grey.shade400,
-                //   inactiveFgColor: Colors.white,
-                //   initialLabelIndex: 1,
-                //   totalSwitches: 2,
-                //   labels: ['Create Organization', 'Join Organization'],
-                //   radiusStyle: true,
-                //   fontSize: 14.sp,
-                //   onToggle: (index) {
-                //     print('switched to: $index');
-                //     controller.toggleIndex.value = index!;
-                //   },
-                // ),
-                Padding(
-                  padding: EdgeInsets.only(top: 30.h),
-                  child: Column(
-                    children: [
-                      MyTextfield(
-                        hinttext: 'First Name',
-                        controller: controller.fnameCtrl,
+              ),
+
+              SizedBox(height: 30.h),
+
+              /// Create button (same as login)
+              Obx(
+                () => AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  height: 54.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors:
+                          controller.isLoading.value
+                              ? [Colors.blueGrey, Colors.blueGrey]
+                              : [Colors.blue, Colors.lightBlueAccent],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow:
+                        controller.isLoading.value
+                            ? []
+                            : [
+                              BoxShadow(
+                                color: Colors.blue.withOpacity(0.3),
+                                blurRadius: 18,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                  ),
+                  child: ElevatedButton(
+                    onPressed:
+                        controller.isLoading.value
+                            ? null
+                            : () => controller.performOperation(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      SizedBox(height: 10.h),
-                      MyTextfield(
-                        hinttext: 'Last Name',
-                        controller: controller.lnameCtrl,
-                      ),
-                      SizedBox(height: 10.h),
-                      MyTextfield(
-                        hinttext: 'Phone',
-                        controller: controller.phoneCtrl,
-                        maxlength: 10,
-                        type: TextInputType.number,
-                      ),
-                      SizedBox(height: 10.h),
-                      MyTextfield(
-                        hinttext: 'Create Password',
-                        controller: controller.passwordCtrl,
-                      ),
-                      SizedBox(height: 10.h),
-                      MyTextfield(
-                        hinttext: 'Organization name',
-                        controller: controller.organizationCtrl,
-                      ),
-                      SizedBox(height: 10.h),
-                      MyTextfield(
-                        hinttext: 'Set Organization Key',
-                        controller: controller.keyCtrl,
-                      ),
-                      SizedBox(height: 10.h),
-                    ],
+                    ),
+                    child:
+                        controller.isLoading.value
+                            ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.4,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Text(
+                                  'Creating account...',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            )
+                            : Text(
+                              'Create account',
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
                   ),
                 ),
-                SizedBox(height: 18.h),
-                Center(
-                  child: InkWell(
-                    onTap: () async {
-                      await controller.performOperation(
-                        // controller.toggleIndex.value,
-                      );
-                    },
-                    child: Container(
-                      height: 40.h,
-                      width: 120.w,
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Create',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
+              ),
+
+              SizedBox(height: 24.h),
+
+              /// Login redirect
+              Center(
+                child: InkWell(
+                  onTap: () => Get.offAllNamed('/login'),
+                  child: Text(
+                    'Already have an account? Login',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-                SizedBox(height: 14.sp),
-                Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Have an account?',
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(width: 4.w),
-                      InkWell(
-                        onTap: () => Get.offAllNamed('/login'),
-                        child: Text(
-                          'Login',
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            color: Colors.blue[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              ),
+
+              SizedBox(height: 30.h),
+            ],
           ),
         ),
       ),

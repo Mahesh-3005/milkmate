@@ -13,6 +13,8 @@ class RegistrationController extends GetxController {
   // RxBool isAdmin = false.obs;
   // RxInt toggleIndex = 1.obs;
 
+  var isLoading = false.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -109,76 +111,100 @@ class RegistrationController extends GetxController {
     if (!phoneValidator(phoneCtrl.text.trim())) return false;
     if (!passwordValidator(passwordCtrl.text.trim())) return false;
     if (!keyValidator(keyCtrl.text.trim())) return false;
-    // if (toggleIndex.value == 0) {
-    //   if (!keyValidator(keyCtrl.text.trim())) return false;
-    //   return true;
-    // }
+  
     return true;
   }
 
-  performOperation() async {
-    // value == 0 ? isAdmin.value = true : isAdmin.value = false;
-    if (await save()) {
-      Get.offAllNamed('/login');
-    }
-  }
-
-  save() async {
-    if (!validation()) return false;
-    bool isPhoneExist = await sregistration.isPhoneExist(phoneCtrl.text.trim());
-    bool isKeyExist = await sregistration.isKeyExist(keyCtrl.text.trim());
-    if (isPhoneExist) {
-      Get.snackbar(
-        "Error",
-        'Phone no. is already exist \nTry Using another Number',
-      );
-      return false;
-    } else if (isKeyExist) {
-      Get.snackbar("Error", 'Use Another Key');
-      return false;
-    } else {
-      // isAdmin.value ? await setAdminDetails() : await setCustomerDetails();
-      await setAdminDetails();
-    }
-    return true;
-  }
-
-  setAdminDetails() async {
-    final orgData = {
+    void performOperation() {
+    if (!validation()) return;
+Get.toNamed(
+  '/registration-processing',
+  arguments: {
+    'org': {
       'key': keyCtrl.text.trim(),
       'name': organizationCtrl.text.trim(),
-    };
-    final orgid = await sregistration.createNewOrganization(orgData);
-    final adminData = {
+    },
+    'admin': {
       'firstname': fnameCtrl.text.trim(),
       'lastname': lnameCtrl.text.trim(),
       'phone': phoneCtrl.text.trim(),
-      // 'password': passwordCtrl.text.trim(),
-      'organization_id': orgid,
-      // 'created_at': DateTime.now().toUtc().toIso8601String(),
-    };
-    await sregistration.saveAdmin(adminData,passwordCtrl.text.trim());
-    Get.snackbar('Success', 'Organization Created');
-  }
+      'organization_id': null, // set after org creation
+    },
+    'password': passwordCtrl.text.trim(),
+  },
+);
 
-  // setCustomerDetails() async {
-  //   final orgId = await sregistration.getOrganizationId(keyCtrl.text.trim());
-  //   if (orgId == 'false') {
-  //     Get.snackbar('Error', "Key is Not Valid");
-  //   } else {
-  //     final adminId = await sregistration.getAdminId(orgId);
-  //     final customerData = {
-  //       'firstname': fnameCtrl.text.trim(),
-  //       'lastname': lnameCtrl.text.trim(),
+    }
+
+    /// 🚀 Move instantly to processing screen
+  //   Get.toNamed(
+  //     '/registration-processing',
+  //     arguments: {
+  //       'fname': fnameCtrl.text.trim(),
+  //       'lname': lnameCtrl.text.trim(),
   //       'phone': phoneCtrl.text.trim(),
   //       'password': passwordCtrl.text.trim(),
-  //       'organization_id': orgId,
-  //       'admin_id': adminId,
-  //       // 'created_at': DateTime.now().toUtc().toIso8601String(),
-  //     };
-  //     await sregistration.saveCustomer(customerData);
-  //     Get.snackbar('Success', 'You Successfully Join Organization');
-  //   }
+  //       'organization': organizationCtrl.text.trim(),
+  //       'key': keyCtrl.text.trim(),
+  //     },
+  //   );
+  // }
+
+  // performOperation() async {
+  //   // value == 0 ? isAdmin.value = true : isAdmin.value = false;
+  //   if (await save()) {
+  //     Get.offAllNamed('/login');
+  //   }                                                    
+  // }
+
+  // save() async {
+  //   if (!validation()) return false;
+  //    /// 🚀 Move instantly to processing screen
+  //   Get.toNamed(
+  //     '/registration-processing',
+  //     arguments: {
+  //       'fname': fnameCtrl.text.trim(),
+  //       'lname': lnameCtrl.text.trim(),
+  //       'phone': phoneCtrl.text.trim(),
+  //       'password': passwordCtrl.text.trim(),
+  //       'organization': organizationCtrl.text.trim(),
+  //       'key': keyCtrl.text.trim(),
+  //     },
+  //   );
+  //   // bool isPhoneExist = await sregistration.isPhoneExist(phoneCtrl.text.trim());
+  //   // bool isKeyExist = await sregistration.isKeyExist(keyCtrl.text.trim());
+  //   // if (isPhoneExist) {
+  //   //   Get.snackbar(
+  //   //     "Error",
+  //   //     'Phone no. is already exist \nTry Using another Number',
+  //   //   );
+  //   //   return false;
+  //   // } else if (isKeyExist) {
+  //   //   Get.snackbar("Error", 'Use Another Key');
+  //   //   return false;
+  //   // } else {
+  //   //   // isAdmin.value ? await setAdminDetails() : await setCustomerDetails();
+  //   //   await setAdminDetails();
+  //   // }
+  //   return true;
+  // }
+
+  // setAdminDetails() async {
+  //   final orgData = {
+  //     'key': keyCtrl.text.trim(),
+  //     'name': organizationCtrl.text.trim(),
+  //   };
+  //   final orgid = await sregistration.createNewOrganization(orgData);
+  //   final adminData = {
+  //     'firstname': fnameCtrl.text.trim(),
+  //     'lastname': lnameCtrl.text.trim(),
+  //     'phone': phoneCtrl.text.trim(),
+  //     // 'password': passwordCtrl.text.trim(),
+  //     'organization_id': orgid,
+  //     // 'created_at': DateTime.now().toUtc().toIso8601String(),
+  //   };
+  //   await sregistration.saveAdmin(adminData,passwordCtrl.text.trim());
+  //   Get.snackbar('Success', 'Organization Created');
   // }
 
   @override

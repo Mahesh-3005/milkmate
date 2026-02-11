@@ -17,6 +17,31 @@ class HomePageController extends GetxController {
   final RxInt delivered = 0.obs;
   final HomePageService service = HomePageService();
   final SyncService syncService = SyncService();
+  final RxInt pendingSyncCount = 0.obs;
+  var isSyncing = false.obs;
+
+  Future<void> sync() async {
+    if (isSyncing.value) return;
+    await syncService.syncAdmin();
+    await syncService.syncOrganization();
+    await syncService.syncCustomer();
+    await syncService.syncDelivered();
+    await syncService.syncEdelivered();
+    await syncService.syncExpense();
+    await syncService.syncIncome();
+    Get.snackbar('Success', 'Sync successfull');
+
+    isSyncing.value = true;
+
+    await Future.delayed(const Duration(seconds: 2)); // simulate sync
+
+    pendingSyncCount.value = 0;
+    isSyncing.value = false;
+  }
+
+  // void logoutConfirmed() {
+  //   Get.offAllNamed('/login');
+  // }
 
   @override
   void onInit() {
@@ -36,16 +61,16 @@ class HomePageController extends GetxController {
     super.onClose();
   }
 
-  Future<void> sync() async {
-    await syncService.syncAdmin();
-    await syncService.syncOrganization();
-    await syncService.syncCustomer();
-    await syncService.syncDelivered();
-    await syncService.syncEdelivered();
-    await syncService.syncExpense();
-    await syncService.syncIncome();
-    Get.snackbar('Success', 'Sync successfull');
-  }
+  // Future<void> sync() async {
+  //   await syncService.syncAdmin();
+  //   await syncService.syncOrganization();
+  //   await syncService.syncCustomer();
+  //   await syncService.syncDelivered();
+  //   await syncService.syncEdelivered();
+  //   await syncService.syncExpense();
+  //   await syncService.syncIncome();
+  //   Get.snackbar('Success', 'Sync successfull');
+  // }
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();

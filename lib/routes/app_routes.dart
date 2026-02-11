@@ -31,8 +31,10 @@ import 'package:milklog/views/deliverystatus.dart';
 import 'package:milklog/views/extradelivered.dart';
 import 'package:milklog/views/homepage.dart';
 import 'package:milklog/views/login.dart';
+import 'package:milklog/views/loginprocessing.dart';
 import 'package:milklog/views/profile.dart';
 import 'package:milklog/views/registration.dart';
+import 'package:milklog/views/registrationprocessing.dart';
 
 class AppPages {
   static final pages = [
@@ -120,6 +122,14 @@ class AppPages {
       name: ('/aincome'),
       page: () => AIncome(),
       binding: AIncomeBimding(),
+    ),
+    GetPage(
+      name: ('/login-processing'),
+      page: () => LoginProcessingPage(),
+    ),
+    GetPage(
+      name: ('/registration-processing'),
+      page: () => RegistrationProcessingPage(),
     ),
   ];
 }

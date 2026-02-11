@@ -64,5 +64,12 @@ final title = ''.obs;
     }
     loadExpenses();
   }
+
+  void clearForm() {
+  title.value = '';
+  amount.value = '';
+  category.value = '';
+  date.value = DateTime.now();
+}
 }
 

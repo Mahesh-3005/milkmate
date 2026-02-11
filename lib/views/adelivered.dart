@@ -3,203 +3,425 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:milklog/getx/controller/ct.adelivered.dart';
 
+// class ADelivered extends StatelessWidget {
+//   final controller = Get.put(ADeliveredController());
+//   ADelivered({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return WillPopScope(
+//       onWillPop: () async {
+//         await Get.delete<ADeliveredController>(
+//           force: true,
+//         ); // ✅ This WILL be triggered on swipe
+//         return true; // Allow back navigation
+//       },
+//       child: Scaffold(
+//         body: SafeArea(
+//           child: Padding(
+//             padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
+//             child: Center(
+//               child: Column(
+//                 children: [
+//                   Text(
+//                     'Mark Customers',
+//                     style: TextStyle(
+//                       fontSize: 30.sp,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                   Container(
+//                     height: 1.h,
+//                     decoration: BoxDecoration(color: Colors.grey),
+//                   ),
+//                   SizedBox(height: 10.h),
+//                   Obx(() {
+//                     return Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                       children: [
+//                         Row(
+//                           mainAxisAlignment: MainAxisAlignment.start,
+//                           children: [
+//                             Text(
+//                           controller.selectedDate.value
+//                               .toLocal()
+//                               .toString()
+//                               .split(' ')[0],
+//                           style: TextStyle(
+//                             fontSize: 22.sp,
+//                             fontWeight: FontWeight.w500,
+//                           ),
+//                         ),
+//                         IconButton(
+//                           onPressed: () async {
+//                             DateTime? picked = await showDatePicker(
+//                               context: context,
+//                               initialDate:
+//                                   controller
+//                                       .selectedDate
+//                                       .value, // default to today
+//                               firstDate: DateTime(2025),
+//                               lastDate: DateTime(2030),
+//                             );
+
+//                             if (picked != null) {
+//                               controller.setDate(picked);
+//                             }
+//                           },
+//                           icon: Icon(Icons.calendar_month_sharp),
+//                         ),
+//                           ],
+//                         ),
+//                         // TextButton(onPressed: () => controller.isTodayMarked(), child: Text(
+//                         //     'Check',
+//                         //     style: TextStyle(
+//                         //       fontSize: 18,
+//                         //       fontWeight: FontWeight.bold,
+//                         //     ),
+//                         //   ),)
+//                       ],
+//                     );
+//                   }),
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       TextButton(
+//                         onPressed: controller.clearAll,
+//                         child: const Text(
+//                           'Clear',
+//                           style: TextStyle(
+//                             fontSize: 18,
+//                             fontWeight: FontWeight.bold,
+//                           ),
+//                         ),
+//                       ),
+//                       TextButton(
+//                         onPressed: controller.selectAll,
+//                         child: const Text(
+//                           'Select All',
+//                           style: TextStyle(
+//                             fontSize: 18,
+//                             fontWeight: FontWeight.bold,
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                   Expanded(
+//                     child: Obx(() {
+//                       return ListView.builder(
+//                         itemCount: controller.customerList.length,
+//                         itemBuilder: (context, index) {
+//                           final customer = controller.customerList[index];
+
+//                           return Obx(() {
+//                             final isSel = controller.isSelected(index);
+
+//                             return Card(
+//                               child: ListTile(
+//                                 dense: true,
+//                                 title: Text(
+//                                   '${index + 1}. ${customer.firstName} ${customer.lastName}',
+//                                   style: TextStyle(fontSize: 15),
+//                                 ),
+//                                 onTap:
+//                                     () => controller.toggle(
+//                                       index,
+//                                       customer.id,
+//                                     ), // tap whole tile
+//                                 trailing: Container(
+//                                   width: 22.w,
+//                                   height: 20.h,
+//                                   alignment: Alignment.center,
+//                                   decoration: BoxDecoration(
+//                                     border: Border.all(
+//                                       color:
+//                                           isSel
+//                                               ? Colors.purple.shade300
+//                                               : Colors.grey,
+//                                       width: 2,
+//                                     ),
+//                                     color:
+//                                         isSel
+//                                             ? Colors.purple.shade300
+//                                                 .withOpacity(0.2)
+//                                             : Colors.transparent,
+//                                     borderRadius: BorderRadius.circular(4),
+//                                   ),
+//                                   child:
+//                                       isSel
+//                                           ? const Icon(
+//                                             Icons.check,
+//                                             size: 18,
+//                                             color: Colors.purple,
+//                                           )
+//                                           : const SizedBox.shrink(),
+//                                 ),
+//                               ),
+//                             );
+//                           });
+//                         },
+//                       );
+//                     }),
+//                   ),
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                     children: [
+//                       Center(
+//                         child: InkWell(
+//                           onTap: () {
+//                             if (controller.saveCustomer()) {
+//                               Get.snackbar("Success", "Customers Delivered Marked Successfully");
+//                               Get.offAllNamed('/home');
+//                             }
+//                           },
+//                           child: Container(
+//                             height: 35.h,
+//                             width: 110.w,
+//                             decoration: BoxDecoration(
+//                               color: Colors.blue,
+//                               borderRadius: BorderRadius.circular(12),
+//                             ),
+//                             child: Center(
+//                               child: Text(
+//                                 'Save',
+//                                 style: TextStyle(
+//                                   color: Colors.white,
+//                                   fontSize: 18.sp,
+//                                   fontWeight: FontWeight.w600,
+//                                 ),
+//                               ),
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
 class ADelivered extends StatelessWidget {
   final controller = Get.put(ADeliveredController());
+
   ADelivered({super.key});
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        await Get.delete<ADeliveredController>(
-          force: true,
-        ); // ✅ This WILL be triggered on swipe
-        return true; // Allow back navigation
+        await Get.delete<ADeliveredController>(force: true);
+        return true;
       },
       child: Scaffold(
+        backgroundColor: Colors.grey.shade100,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.grey.shade100,
+          centerTitle: true,
+          title: Text(
+            'Mark Delivered',
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => Get.back(),
+          ),
+        ),
         body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
-            child: Center(
-              child: Column(
-                children: [
-                  Text(
-                    'Mark Customers',
-                    style: TextStyle(
-                      fontSize: 30.sp,
-                      fontWeight: FontWeight.bold,
+          child: Column(
+            children: [
+              /// Date Selector Card
+              Padding(
+                padding: EdgeInsets.all(16.w),
+                child: Obx(() {
+                  return Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 12.h,
                     ),
-                  ),
-                  Container(
-                    height: 1.h,
-                    decoration: BoxDecoration(color: Colors.grey),
-                  ),
-                  SizedBox(height: 10.h),
-                  Obx(() {
-                    return Row(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
+                            const Icon(Icons.calendar_today, size: 18),
+                            SizedBox(width: 10.w),
                             Text(
-                          controller.selectedDate.value
-                              .toLocal()
-                              .toString()
-                              .split(' ')[0],
-                          style: TextStyle(
-                            fontSize: 22.sp,
-                            fontWeight: FontWeight.w500,
-                          ),
+                              controller.selectedDate.value
+                                  .toLocal()
+                                  .toString()
+                                  .split(' ')[0],
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
                         IconButton(
                           onPressed: () async {
                             DateTime? picked = await showDatePicker(
                               context: context,
-                              initialDate:
-                                  controller
-                                      .selectedDate
-                                      .value, // default to today
+                              initialDate: controller.selectedDate.value,
                               firstDate: DateTime(2025),
                               lastDate: DateTime(2030),
                             );
-
                             if (picked != null) {
                               controller.setDate(picked);
                             }
                           },
-                          icon: Icon(Icons.calendar_month_sharp),
+                          icon: const Icon(Icons.edit_calendar),
                         ),
-                          ],
-                        ),
-                        // TextButton(onPressed: () => controller.isTodayMarked(), child: Text(
-                        //     'Check',
-                        //     style: TextStyle(
-                        //       fontSize: 18,
-                        //       fontWeight: FontWeight.bold,
-                        //     ),
-                        //   ),)
                       ],
-                    );
-                  }),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton(
-                        onPressed: controller.clearAll,
-                        child: const Text(
-                          'Clear',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: controller.selectAll,
-                        child: const Text(
-                          'Select All',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Expanded(
-                    child: Obx(() {
-                      return ListView.builder(
-                        itemCount: controller.customerList.length,
-                        itemBuilder: (context, index) {
-                          final customer = controller.customerList[index];
-
-                          return Obx(() {
-                            final isSel = controller.isSelected(index);
-
-                            return Card(
-                              child: ListTile(
-                                dense: true,
-                                title: Text(
-                                  '${index + 1}. ${customer.firstName} ${customer.lastName}',
-                                  style: TextStyle(fontSize: 15),
-                                ),
-                                onTap:
-                                    () => controller.toggle(
-                                      index,
-                                      customer.id,
-                                    ), // tap whole tile
-                                trailing: Container(
-                                  width: 22.w,
-                                  height: 20.h,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color:
-                                          isSel
-                                              ? Colors.purple.shade300
-                                              : Colors.grey,
-                                      width: 2,
-                                    ),
-                                    color:
-                                        isSel
-                                            ? Colors.purple.shade300
-                                                .withOpacity(0.2)
-                                            : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child:
-                                      isSel
-                                          ? const Icon(
-                                            Icons.check,
-                                            size: 18,
-                                            color: Colors.purple,
-                                          )
-                                          : const SizedBox.shrink(),
-                                ),
-                              ),
-                            );
-                          });
-                        },
-                      );
-                    }),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Center(
-                        child: InkWell(
-                          onTap: () {
-                            if (controller.saveCustomer()) {
-                              Get.snackbar("Success", "Customers Delivered Marked Successfully");
-                              Get.offAllNamed('/home');
-                            }
-                          },
-                          child: Container(
-                            height: 35.h,
-                            width: 110.w,
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Center(
-                              child: Text(
-                                'Save',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18.sp,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  );
+                }),
               ),
-            ),
+
+              /// Action Row
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: controller.clearAll,
+                      child: const Text(
+                        'Clear',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: controller.selectAll,
+                      child: const Text(
+                        'Select All',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              /// Customer List
+              Expanded(
+                child: Obx(() {
+                  return ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    itemCount: controller.customerList.length,
+                    itemBuilder: (context, index) {
+                      final customer = controller.customerList[index];
+
+                      return Obx(() {
+                        final isSel = controller.isSelected(index);
+
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 8.h),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color:
+                                  isSel
+                                      ? Colors.blue
+                                      : Colors.grey.shade300,
+                            ),
+                          ),
+                          child: ListTile(
+                            onTap: () => controller.toggle(
+                              index,
+                              customer.id,
+                            ),
+                            title: Text(
+                              '${customer.firstName} ${customer.lastName}',
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            trailing: Container(
+                              width: 26.w,
+                              height: 26.w,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(6),
+                                color:
+                                    isSel
+                                        ? Colors.blue
+                                        : Colors.transparent,
+                                border: Border.all(
+                                  color:
+                                      isSel
+                                          ? Colors.blue
+                                          : Colors.grey,
+                                  width: 2,
+                                ),
+                              ),
+                              child:
+                                  isSel
+                                      ? const Icon(
+                                        Icons.check,
+                                        size: 18,
+                                        color: Colors.white,
+                                      )
+                                      : null,
+                            ),
+                          ),
+                        );
+                      });
+                    },
+                  );
+                }),
+              ),
+
+              /// Save Button
+              Padding(
+                padding: EdgeInsets.all(16.w),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48.h,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (controller.saveCustomer()) {
+                        Get.snackbar(
+                          'Success',
+                          'Customers marked as delivered',
+                        );
+                        Get.offAllNamed('/home');
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(
+                      'Mark Delivered',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
