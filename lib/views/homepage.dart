@@ -610,28 +610,28 @@ class HomePage extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              // const SizedBox(height: 24),
 
-              /// ───────── Financial Snapshot ─────────
-              Row(
-                children: [
-                  Expanded(
-                    child: _StatCard(
-                      title: "Today’s Income",
-                      value: 100.obs,
-                      prefix: "₹",
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _StatCard(
-                      title: "This Month",
-                      value: 100.obs,
-                      prefix: "₹",
-                    ),
-                  ),
-                ],
-              ),
+              // /// ───────── Financial Snapshot ─────────
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: _StatCard(
+              //         title: "Today’s Income",
+              //         value: 100.obs,
+              //         prefix: "₹",
+              //       ),
+              //     ),
+              //     const SizedBox(width: 12),
+              //     Expanded(
+              //       child: _StatCard(
+              //         title: "This Month",
+              //         value: 100.obs,
+              //         prefix: "₹",
+              //       ),
+              //     ),
+              //   ],
+              // ),
 
               const SizedBox(height: 32),
 
