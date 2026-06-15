@@ -1,16 +1,29 @@
-# milklog
+# Hi, I'm Mahesh 👋
 
-A new Flutter project.
+## Full Stack Developer | Flutter | Supabase | Hive
 
-## Getting Started
+I build scalable mobile applications with a focus on performance and real-world usability.
 
-This project is a starting point for a Flutter application.
+### 🚀 Current Project
 
-A few resources to get you started if this is your first Flutter project:
+* **MilkMate** – Dairy Management System for handling 80+ customers
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+  * Flutter + Supabase + Hive
+  * Offline-first architecture with local database sync
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 🛠 Tech Stack
+
+* **Frontend:** Flutter 
+* **Backend:** Supabase , REST APIs
+* **Database:** Supabase (PostgreSQL), Hive
+* **State Management:** GetX
+
+### 💡 What I Focus On
+
+* Building real-world applications
+* Scalable backend systems
+* Offline-first mobile apps
+
+### 📫 Connect with me
+
+* LinkedIn: www.linkedin.com/in/mahesh-mahadik-14a4813b4
