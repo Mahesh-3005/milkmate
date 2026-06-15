@@ -41,7 +41,7 @@ import 'package:milklog/getx/controller/ct.acustomer.dart';
 //                       itemCount: controller.customerList.length,
 //                       itemBuilder: (context, index) {
 //                         var customer = controller.customerList[index];
-//                         return 
+//                         return
 //                         Column(
 //                           children: [
 //                             Card(
@@ -81,8 +81,6 @@ import 'package:milklog/getx/controller/ct.acustomer.dart';
 //     );
 //   }
 // }
-
-
 
 // class ACustomer extends StatelessWidget {
 //   final controller = Get.put(ACustomerController());
@@ -371,10 +369,11 @@ class ACustomer extends StatelessWidget {
 
                 return InkWell(
                   borderRadius: BorderRadius.circular(14),
-                  onTap: () => Get.toNamed(
-                    '/dcustomer',
-                    arguments: {'id': customer.id},
-                  ),
+                  onTap:
+                      () => Get.toNamed(
+                        '/dcustomer',
+                        arguments: {'id': customer.id},
+                      ),
                   child: Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: 14.w,
@@ -383,9 +382,7 @@ class ACustomer extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: Colors.grey.shade200,
-                      ),
+                      border: Border.all(color: Colors.grey.shade200),
                     ),
                     child: Row(
                       children: [

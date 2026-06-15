@@ -159,7 +159,7 @@ class ABill extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 10.sp,),
+                      SizedBox(height: 10.sp),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
